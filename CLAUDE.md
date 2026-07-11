@@ -9,7 +9,7 @@ Expensio is a personal expense-tracker web app (Flask + SQLite + Jinja templates
 The intended build order is encoded in the code itself:
 - `app.py` — placeholder routes each return a `"... coming in Step N"` string (logout=Step 3, profile=Step 4, add expense=Step 7, edit=Step 8, delete=Step 9).
 - `database/db.py` — currently only a spec comment. Step 1 is to implement `get_db()` (SQLite connection with `row_factory` + foreign keys enabled), `init_db()` (`CREATE TABLE IF NOT EXISTS`), and `seed_db()` (sample dev data).
-- `static/js/main.js` — empty placeholder for client-side JS added as features are built.
+- `static/js/main.js` — client-side JS added as features are built; currently holds the landing page's "See how it works" video modal (open/close/escape/backdrop-click handling).
 
 ## Commands
 
@@ -28,8 +28,8 @@ The app runs in debug mode (auto-reload on save), on port **5001** (not the Flas
 
 ## Architecture
 
-- **Routing/rendering**: single `app.py` maps routes to `render_template(...)`. All internal links use `url_for('<route_func>')`, so renaming a route function requires updating templates too.
-- **Templates**: Jinja inheritance. Every page extends `templates/base.html`, which owns the navbar, footer, Google Fonts, the `style.css` link, and `main.js`. Child pages override `{% block title %}` and `{% block content %}` (also available: `{% block head %}`, `{% block scripts %}`). The brand name "Expensio" appears in `base.html` (title/nav/footer) and per-page titles/copy across the auth and landing templates.
+- **Routing/rendering**: single `app.py` maps routes to `render_template(...)`, including static legal pages `/terms` and `/privacy`. All internal links use `url_for('<route_func>')`, so renaming a route function requires updating templates too.
+- **Templates**: Jinja inheritance. Every page extends `templates/base.html`, which owns the navbar, footer, Google Fonts, the `style.css` link, and `main.js`. Child pages override `{% block title %}` and `{% block content %}` (also available: `{% block head %}`, `{% block scripts %}`). The brand name "Expensio" appears in `base.html` (title/nav/footer) and per-page titles/copy across the auth, landing, and legal (`terms.html`, `privacy.html`) templates.
 - **Database**: SQLite. The DB file is `expense_tracker.db` (gitignored) — created/seeded by the `init_db()`/`seed_db()` functions once implemented in `database/db.py`. The `database/` package is the single data-access layer.
 - **Static assets**: `static/css/style.css` (all styling; hand-written, no framework) and `static/js/main.js`.
 
