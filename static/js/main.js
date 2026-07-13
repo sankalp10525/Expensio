@@ -1,6 +1,20 @@
 // main.js — students will add JavaScript here as features are built
 
 document.addEventListener('DOMContentLoaded', function () {
+    var themeToggle = document.getElementById('theme-toggle');
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function () {
+            var root = document.documentElement;
+            var systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var current = root.getAttribute('data-theme') || (systemPrefersDark ? 'dark' : 'light');
+            var next = current === 'dark' ? 'light' : 'dark';
+
+            root.setAttribute('data-theme', next);
+            localStorage.setItem('expensio-theme', next);
+        });
+    }
+
     var openBtn = document.getElementById('see-how-it-works-btn');
     var modal = document.getElementById('video-modal');
     var closeBtn = document.getElementById('modal-close-btn');

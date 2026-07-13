@@ -3,21 +3,31 @@
 /* ------------------------------------------------------------------ */
 
 :root {
-    --ink: #0f0f0f;
-    --ink-soft: #2d2d2d;
-    --ink-muted: #6b6b6b;
-    --ink-faint: #a0a0a0;
+    --ink: #1c1b19;
+    --ink-soft: #3a3936;
+    --ink-muted: #746f68;
+    --ink-faint: #a8a29a;
     --paper: #f7f6f3;
     --paper-warm: #f0ede6;
     --paper-card: #ffffff;
-    --accent: #1a472a;
+    --accent: #2f5f42;
     --accent-light: #e8f0eb;
-    --accent-2: #c17f24;
+    --accent-2: #b3792e;
     --accent-2-light: #fdf3e3;
-    --danger: #c0392b;
+    --accent-title: #3d8a5c;
+    --danger: #b3493b;
     --danger-light: #fdecea;
+    --danger-border: #f0c9c4;
     --border: #e4e1da;
     --border-soft: #eeebe4;
+    --overlay: rgba(28, 27, 25, 0.7);
+    --nav-cta-text: #f7f6f3;
+    --mock-dot-red: #e08a83;
+    --mock-dot-yellow: #e3bb72;
+    --mock-dot-green: #8fc2a5;
+    --mock-bar-food: #dba361;
+    --mock-bar-travel: #7d9de0;
+    --mock-bar-bills: #a692d8;
 
     --font-display: 'DM Serif Display', Georgia, serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
@@ -28,7 +38,73 @@
     --radius-sm: 6px;
     --radius-md: 12px;
     --radius-lg: 20px;
+
+    color-scheme: light;
 }
+
+:root[data-theme="dark"] {
+    --ink: #ece9e4;
+    --ink-soft: #cbc6bd;
+    --ink-muted: #99938a;
+    --ink-faint: #6b665f;
+    --paper: #171614;
+    --paper-warm: #1d1c19;
+    --paper-card: #211f1c;
+    --accent: #6fae86;
+    --accent-light: #24332a;
+    --accent-2: #d4a25e;
+    --accent-2-light: #332a1c;
+    --accent-title: #7dc298;
+    --danger: #e0847a;
+    --danger-light: #332320;
+    --danger-border: #4a2e2a;
+    --border: #34322d;
+    --border-soft: #2a2825;
+    --overlay: rgba(0, 0, 0, 0.75);
+    --nav-cta-text: #171614;
+    --mock-dot-red: #c66f68;
+    --mock-dot-yellow: #c9a15f;
+    --mock-dot-green: #6fa082;
+    --mock-bar-food: #c58c4c;
+    --mock-bar-travel: #6c8ad4;
+    --mock-bar-bills: #9179c9;
+
+    color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --ink: #ece9e4;
+        --ink-soft: #cbc6bd;
+        --ink-muted: #99938a;
+        --ink-faint: #6b665f;
+        --paper: #171614;
+        --paper-warm: #1d1c19;
+        --paper-card: #211f1c;
+        --accent: #6fae86;
+        --accent-light: #24332a;
+        --accent-2: #d4a25e;
+        --accent-2-light: #332a1c;
+        --accent-title: #7dc298;
+        --danger: #e0847a;
+        --danger-light: #332320;
+        --danger-border: #4a2e2a;
+        --border: #34322d;
+        --border-soft: #2a2825;
+        --overlay: rgba(0, 0, 0, 0.75);
+        --nav-cta-text: #171614;
+        --mock-dot-red: #c66f68;
+        --mock-dot-yellow: #c9a15f;
+        --mock-dot-green: #6fa082;
+        --mock-bar-food: #c58c4c;
+        --mock-bar-travel: #6c8ad4;
+        --mock-bar-bills: #9179c9;
+
+        color-scheme: dark;
+    }
+}
+
+body { transition: background-color 0.2s ease, color 0.2s ease; }
 
 /* ------------------------------------------------------------------ */
 /* Reset                                                               */
@@ -105,13 +181,35 @@ a { color: inherit; text-decoration: none; }
 
 .nav-cta {
     background: var(--ink) !important;
-    color: var(--paper) !important;
+    color: var(--nav-cta-text) !important;
     padding: 0.45rem 1.1rem;
     border-radius: var(--radius-sm);
     transition: background 0.2s !important;
 }
 
 .nav-cta:hover { background: var(--accent) !important; }
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--paper-card);
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.theme-toggle:hover { border-color: var(--ink-muted); color: var(--ink); }
+
+.theme-toggle .icon-moon { display: none; }
+:root[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .icon-moon { display: inline; }
 
 /* ------------------------------------------------------------------ */
 /* Main                                                                */
@@ -162,7 +260,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .hero-title-accent {
-    color: #1f9d55;
+    color: var(--accent-title);
 }
 
 .hero-subtitle {
@@ -212,9 +310,9 @@ a { color: inherit; text-decoration: none; }
     border-radius: 50%;
 }
 
-.mock-dot-red { background: #f47069; }
-.mock-dot-yellow { background: #f5b942; }
-.mock-dot-green { background: #62c68f; }
+.mock-dot-red { background: var(--mock-dot-red); }
+.mock-dot-yellow { background: var(--mock-dot-yellow); }
+.mock-dot-green { background: var(--mock-dot-green); }
 
 .mock-stats {
     display: grid;
@@ -250,7 +348,7 @@ a { color: inherit; text-decoration: none; }
     font-weight: 500;
 }
 
-.mock-delta-positive { color: #1f9d55; }
+.mock-delta-positive { color: var(--accent-title); }
 .mock-delta-muted { color: var(--ink-muted); }
 
 .mock-bars {
@@ -289,9 +387,9 @@ a { color: inherit; text-decoration: none; }
     transition: width 0.6s ease;
 }
 
-.mock-bar-food { background: #f0a63e; }
-.mock-bar-travel { background: #4f7df0; }
-.mock-bar-bills { background: #8b6fe8; }
+.mock-bar-food { background: var(--mock-bar-food); }
+.mock-bar-travel { background: var(--mock-bar-travel); }
+.mock-bar-bills { background: var(--mock-bar-bills); }
 
 /* ------------------------------------------------------------------ */
 /* Buttons                                                             */
@@ -450,7 +548,7 @@ a { color: inherit; text-decoration: none; }
 .auth-error {
     background: var(--danger-light);
     color: var(--danger);
-    border: 1px solid #f5c6c2;
+    border: 1px solid var(--danger-border);
     border-radius: var(--radius-sm);
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
@@ -616,7 +714,7 @@ a { color: inherit; text-decoration: none; }
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 15, 15, 0.75);
+    background: var(--overlay);
     display: flex;
     align-items: center;
     justify-content: center;
