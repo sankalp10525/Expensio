@@ -90,6 +90,25 @@ def seed_db():
     conn.close()
 
 
+def create_user(name, email, password):
+    """Insert a new user with a hashed password.
+
+    Returns the new user's id, or ``None`` if the email is already taken.
+    """
+    conn = get_db()
+    try:
+        cur = conn.execute(
+            "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
+            (name, email, generate_password_hash(password, method="pbkdf2:sha256")),
+        )
+        conn.commit()
+        return cur.lastrowid
+    except sqlite3.IntegrityError:  # UNIQUE email constraint violated
+        return None
+    finally:
+        conn.close()
+
+
 if __name__ == "__main__":
     init_db()
     seed_db()
