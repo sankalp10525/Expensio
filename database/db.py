@@ -120,6 +120,17 @@ def get_user_by_email(email):
         conn.close()
 
 
+def get_user_by_id(user_id):
+    """Return the user row for ``user_id``, or ``None`` if no such user exists."""
+    conn = get_db()
+    try:
+        return conn.execute(
+            "SELECT * FROM users WHERE id = ?", (user_id,)
+        ).fetchone()
+    finally:
+        conn.close()
+
+
 if __name__ == "__main__":
     init_db()
     seed_db()

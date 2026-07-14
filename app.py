@@ -1,9 +1,17 @@
 import os
+from datetime import datetime
 
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import check_password_hash
 
-from database.db import get_db, init_db, seed_db, create_user, get_user_by_email
+from database.db import (
+    get_db,
+    init_db,
+    seed_db,
+    create_user,
+    get_user_by_email,
+    get_user_by_id,
+)
 
 app = Flask(__name__)
 
@@ -99,7 +107,26 @@ def logout():
 
 @app.route("/profile")
 def profile():
-    return "Profile page — coming in Step 4"
+    # Auth guard: send logged-out visitors to the login page (redirect, not 403).
+    if session.get("user_id") is None:
+        return redirect(url_for("login"))
+
+    user = get_user_by_id(session["user_id"])
+    if user is None:  # stale session referencing a deleted user
+        session.clear()
+        return redirect(url_for("login"))
+
+    # created_at is stored by SQLite as "YYYY-MM-DD HH:MM:SS"; render it human-readable.
+    member_since = "—"
+    if user["created_at"]:
+        try:
+            member_since = datetime.strptime(
+                user["created_at"], "%Y-%m-%d %H:%M:%S"
+            ).strftime("%-d %B %Y")
+        except ValueError:
+            member_since = "—"
+
+    return render_template("profile.html", user=user, member_since=member_since)
 
 
 @app.route("/expenses/add")
