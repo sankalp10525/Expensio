@@ -150,7 +150,7 @@ The seed data creates a demo user you can use once auth is wired up:
 
 | Email | Password |
 |---|---|
-| `demo@spendly.com` | `demo123` |
+| `demo@expensio.com` | `demo123` |
 
 ---
 
