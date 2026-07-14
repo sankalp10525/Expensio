@@ -1,13 +1,28 @@
-from flask import Flask, render_template, request, redirect, url_for
+import os
 
-from database.db import get_db, init_db, seed_db, create_user
+from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.security import check_password_hash
+
+from database.db import get_db, init_db, seed_db, create_user, get_user_by_email
 
 app = Flask(__name__)
+
+# Session signing key — sourced from the environment (.env is gitignored); the
+# dev fallback keeps local runs working without extra setup.
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-only-change-me")
 
 # Ensure the database schema exists and demo data is present before serving.
 with app.app_context():
     init_db()
     seed_db()
+
+
+@app.context_processor
+def inject_current_user():
+    """Expose the logged-in user (or None) to every template, e.g. the navbar."""
+    uid = session.get("user_id")
+    current_user = {"id": uid, "name": session.get("user_name")} if uid else None
+    return {"current_user": current_user}
 
 
 # ------------------------------------------------------------------ #
@@ -42,8 +57,23 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+
+        user = get_user_by_email(email)
+        if user is not None and check_password_hash(user["password_hash"], password):
+            session["user_id"] = user["id"]
+            session["user_name"] = user["name"]
+            return redirect(url_for("profile"))
+
+        # Generic message — never reveal whether the email or the password was wrong.
+        return render_template(
+            "login.html", error="Invalid email or password.", email=email
+        )
+
     return render_template("login.html")
 
 
@@ -63,7 +93,8 @@ def privacy():
 
 @app.route("/logout")
 def logout():
-    return "Logout — coming in Step 3"
+    session.clear()
+    return redirect(url_for("landing"))
 
 
 @app.route("/profile")

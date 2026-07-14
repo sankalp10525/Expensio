@@ -71,7 +71,7 @@ Generate a spec document with this exact structure:
 
 ## Overview
 One paragraph describing what this feature does and why
-it exists at this stage of the Spendly roadmap.
+it exists at this stage of the Expensio roadmap.
 
 ## Depends on
 Which previous steps this feature requires to be complete.
