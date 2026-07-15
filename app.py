@@ -116,17 +116,34 @@ def profile():
         session.clear()
         return redirect(url_for("login"))
 
-    # created_at is stored by SQLite as "YYYY-MM-DD HH:MM:SS"; render it human-readable.
+    # created_at is stored by SQLite as "YYYY-MM-DD HH:MM:SS"; render it human-readable
+    # and compute how many days the account has existed (for the animated badge).
     member_since = "—"
+    member_days = 0
     if user["created_at"]:
         try:
-            member_since = datetime.strptime(
-                user["created_at"], "%Y-%m-%d %H:%M:%S"
-            ).strftime("%-d %B %Y")
+            created = datetime.strptime(user["created_at"], "%Y-%m-%d %H:%M:%S")
+            member_since = created.strftime("%-d %B %Y")
+            member_days = max((datetime.now() - created).days, 0)
         except ValueError:
             member_since = "—"
 
-    return render_template("profile.html", user=user, member_since=member_since)
+    # Initials + first name drive the avatar and the client-side greeting.
+    parts = user["name"].split()
+    if parts:
+        initials = (parts[0][0] + (parts[-1][0] if len(parts) > 1 else "")).upper()
+        first_name = parts[0]
+    else:
+        initials, first_name = "?", user["name"]
+
+    return render_template(
+        "profile.html",
+        user=user,
+        member_since=member_since,
+        member_days=member_days,
+        initials=initials,
+        first_name=first_name,
+    )
 
 
 @app.route("/expenses/add")
