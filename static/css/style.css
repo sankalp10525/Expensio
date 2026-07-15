@@ -612,17 +612,43 @@ a { color: inherit; text-decoration: none; }
 
 .auth-switch a:hover { text-decoration: underline; }
 
-/* Profile details — label/value rows inside the auth card */
+/* Profile page — avatar hero, detail rows, copy button, membership badge */
+.profile-hero { margin-bottom: 1.75rem; }
+
+.profile-avatar {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 1.1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: var(--nav-cta-text);
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.profile-avatar:hover { transform: scale(1.05) rotate(-3deg); }
+
+.profile-greeting { transition: opacity 0.2s ease; }
+
 .profile-row {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
     gap: 1rem;
-    padding: 0.9rem 0;
+    padding: 0.9rem 0.75rem;
+    margin: 0 -0.75rem;
     border-bottom: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    transition: background 0.2s ease;
 }
 
 .profile-row:last-child { border-bottom: none; }
+.profile-row:hover { background: var(--paper-warm); }
 
 .profile-label {
     font-size: 0.85rem;
@@ -631,10 +657,58 @@ a { color: inherit; text-decoration: none; }
 }
 
 .profile-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
     font-size: 0.95rem;
     color: var(--ink);
     text-align: right;
     word-break: break-word;
+}
+
+.copy-btn {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-light);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 0.2rem 0.55rem;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.copy-btn:hover { border-color: var(--accent); }
+.copy-btn.is-copied { color: var(--nav-cta-text); background: var(--accent); }
+
+.profile-badge {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--accent-2);
+    background: var(--accent-2-light);
+    border-radius: var(--radius-sm);
+    padding: 0.2rem 0.55rem;
+    white-space: nowrap;
+}
+
+/* Staggered entrance — the hero and card ease in on load */
+@keyframes profile-rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.profile .profile-hero,
+.profile .profile-card {
+    animation: profile-rise 0.5s ease both;
+}
+
+.profile .profile-card { animation-delay: 0.08s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .profile .profile-hero,
+    .profile .profile-card,
+    .profile-avatar { animation: none; transition: none; }
 }
 
 /* ------------------------------------------------------------------ */

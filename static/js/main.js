@@ -15,6 +15,66 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // --- Profile page interactivity (no-ops on pages without these elements) ---
+    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Time-of-day greeting personalised to the logged-in user.
+    var greeting = document.querySelector('.profile-greeting');
+    if (greeting) {
+        var name = greeting.getAttribute('data-name') || '';
+        var hour = new Date().getHours();
+        var salutation = hour < 12 ? 'Good morning'
+            : hour < 18 ? 'Good afternoon'
+            : 'Good evening';
+        greeting.textContent = salutation + (name ? ', ' + name : '');
+    }
+
+    // Copy email (or any value) to the clipboard with brief button feedback.
+    var copyButtons = document.querySelectorAll('.copy-btn');
+    Array.prototype.forEach.call(copyButtons, function (btn) {
+        var original = btn.textContent;
+        var resetTimer;
+
+        btn.addEventListener('click', function () {
+            var value = btn.getAttribute('data-copy') || '';
+
+            function showCopied() {
+                btn.textContent = 'Copied!';
+                btn.classList.add('is-copied');
+                clearTimeout(resetTimer);
+                resetTimer = setTimeout(function () {
+                    btn.textContent = original;
+                    btn.classList.remove('is-copied');
+                }, 1500);
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(value).then(showCopied, function () {});
+            }
+        });
+    });
+
+    // Count the "days as member" badge up from zero on load.
+    var badge = document.querySelector('.profile-badge');
+    if (badge) {
+        var target = parseInt(badge.getAttribute('data-days'), 10) || 0;
+        var unit = function (n) { return n + ' day' + (n === 1 ? '' : 's'); };
+
+        if (prefersReducedMotion || target === 0) {
+            badge.textContent = unit(target);
+        } else {
+            var start = null;
+            var duration = 800;
+            var step = function (timestamp) {
+                if (start === null) start = timestamp;
+                var progress = Math.min((timestamp - start) / duration, 1);
+                badge.textContent = unit(Math.round(progress * target));
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+    }
+
     var openBtn = document.getElementById('see-how-it-works-btn');
     var modal = document.getElementById('video-modal');
     var closeBtn = document.getElementById('modal-close-btn');
