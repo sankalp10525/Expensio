@@ -22,29 +22,74 @@ document.addEventListener('DOMContentLoaded', function () {
     // so views ease into place. querySelectorAll returns document order,
     // so the index gives a natural top-to-bottom stagger. The .settle
     // class is inert under reduced motion (handled in CSS), and absent
-    // JS the content simply renders as-is.
-    var settleTargets = document.querySelectorAll(
-        '.hero, .feature-card, .cta-section, ' +
-        '.auth-header, .auth-card, .auth-switch, ' +
-        '.legal-header, .legal-body'
-    );
-    Array.prototype.forEach.call(settleTargets, function (el, i) {
-        el.style.setProperty('--settle-i', i);
-        el.classList.add('settle');
-    });
-
-    // Hero mock bars fill from zero once the card has settled, giving the
-    // landing visual a satisfying second beat.
-    if (!prefersReducedMotion) {
-        var mockBars = document.querySelectorAll('.mock-bar');
-        Array.prototype.forEach.call(mockBars, function (bar) {
-            var target = bar.style.width;
-            bar.style.transition = 'none';   // reset to empty without animating
-            bar.style.width = '0';
-            void bar.offsetWidth;            // flush the reset
-            bar.style.transition = '';       // restore the stylesheet's width transition
-            setTimeout(function () { bar.style.width = target; }, 500);
+    // JS the content simply renders as-is. Runs once the loader lifts.
+    function revealPage() {
+        var settleTargets = document.querySelectorAll(
+            '.hero, .feature-card, .cta-section, ' +
+            '.auth-header, .auth-card, .auth-switch, ' +
+            '.legal-header, .legal-body'
+        );
+        Array.prototype.forEach.call(settleTargets, function (el, i) {
+            el.style.setProperty('--settle-i', i);
+            el.classList.add('settle');
         });
+
+        // Hero mock bars fill from zero once the card has settled, giving
+        // the landing visual a satisfying second beat.
+        if (!prefersReducedMotion) {
+            var mockBars = document.querySelectorAll('.mock-bar');
+            Array.prototype.forEach.call(mockBars, function (bar) {
+                var target = bar.style.width;
+                bar.style.transition = 'none';   // reset to empty without animating
+                bar.style.width = '0';
+                void bar.offsetWidth;            // flush the reset
+                bar.style.transition = '';       // restore the stylesheet's width transition
+                setTimeout(function () { bar.style.width = target; }, 500);
+            });
+        }
+    }
+
+    // --- Page loader ----------------------------------------------------
+    // The loader covers the page on first paint; once we've shown it for a
+    // frame we fade it out and let the content settle in underneath. It is
+    // shown again while a same-site navigation is in flight.
+    var loader = document.getElementById('page-loader');
+
+    if (loader) {
+        window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(function () {
+                loader.classList.add('is-hidden');
+                revealPage();
+            });
+        });
+
+        var showLoader = function () { loader.classList.remove('is-hidden'); };
+
+        // Spinner while navigating to another page via a normal link click.
+        document.addEventListener('click', function (event) {
+            if (event.defaultPrevented || event.button !== 0) return;
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            var link = event.target.closest ? event.target.closest('a') : null;
+            if (!link) return;
+            var href = link.getAttribute('href');
+            if (!href || href.charAt(0) === '#') return;
+            if (link.target === '_blank' || link.hasAttribute('download')) return;
+            if (link.origin && link.origin !== window.location.origin) return;
+            showLoader();
+        });
+
+        // ...and while a form (login / register) submits.
+        Array.prototype.forEach.call(document.querySelectorAll('form'), function (form) {
+            form.addEventListener('submit', function () { showLoader(); });
+        });
+
+        // Returning via the back/forward cache can restore the page with the
+        // spinner still up — make sure it's cleared.
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) loader.classList.add('is-hidden');
+        });
+    } else {
+        revealPage();
     }
 
     // --- Profile page interactivity (no-ops on pages without these elements) ---
