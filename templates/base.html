@@ -16,9 +16,14 @@
             }
         })();
     </script>
+    <noscript><style>.page-loader { display: none !important; }</style></noscript>
     {% block head %}{% endblock %}
 </head>
 <body>
+
+    <div class="page-loader" id="page-loader" role="status" aria-label="Loading">
+        <span class="page-loader-spinner" aria-hidden="true"></span>
+    </div>
 
     <nav class="navbar">
         <div class="nav-inner">

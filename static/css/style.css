@@ -29,6 +29,9 @@
     --mock-bar-travel: #7d9de0;
     --mock-bar-bills: #a692d8;
 
+    --bg-dot: rgba(28, 27, 25, 0.05);
+    --bg-glow: rgba(47, 95, 66, 0.05);
+
     --font-display: 'DM Serif Display', Georgia, serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
 
@@ -69,6 +72,9 @@
     --mock-bar-travel: #6c8ad4;
     --mock-bar-bills: #9179c9;
 
+    --bg-dot: rgba(236, 233, 228, 0.04);
+    --bg-glow: rgba(111, 174, 134, 0.06);
+
     color-scheme: dark;
 }
 
@@ -100,6 +106,9 @@
         --mock-bar-travel: #6c8ad4;
         --mock-bar-bills: #9179c9;
 
+        --bg-dot: rgba(236, 233, 228, 0.04);
+        --bg-glow: rgba(111, 174, 134, 0.06);
+
         color-scheme: dark;
     }
 }
@@ -119,7 +128,15 @@ body { transition: background-color 0.2s ease, color 0.2s ease; }
 html { font-size: 16px; scroll-behavior: smooth; }
 
 body {
-    background: var(--paper);
+    background-color: var(--paper);
+    /* A soft accent wash at the top, over a faint fixed dot grid. Both use
+       theme variables, so the texture reads correctly in light and dark. */
+    background-image:
+        radial-gradient(circle at 50% 0%, var(--bg-glow), transparent 60%),
+        radial-gradient(var(--bg-dot) 1px, transparent 1.5px);
+    background-size: 100% 620px, 24px 24px;
+    background-repeat: no-repeat, repeat;
+    background-attachment: fixed, fixed;
     color: var(--ink);
     font-family: var(--font-body);
     font-size: 1rem;
@@ -727,6 +744,46 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
     .settle { animation: none; }
     .profile-avatar { transition: none; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Page loader                                                         */
+/* ------------------------------------------------------------------ */
+/* A full-screen spinner shown on first paint and during same-site     */
+/* navigations, then faded out by main.js. A <noscript> rule hides it  */
+/* entirely when JavaScript is unavailable so it can never get stuck.  */
+
+.page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--paper);
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.page-loader.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.page-loader-spinner {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spinner-rotate 0.7s linear infinite;
+}
+
+@keyframes spinner-rotate {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page-loader-spinner { animation-duration: 1.6s; }
 }
 
 /* ------------------------------------------------------------------ */
