@@ -15,8 +15,39 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- Profile page interactivity (no-ops on pages without these elements) ---
     var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // --- App-wide "settle" entrance -------------------------------------
+    // Fade-and-rise the main sections and key content blocks of each page
+    // so views ease into place. querySelectorAll returns document order,
+    // so the index gives a natural top-to-bottom stagger. The .settle
+    // class is inert under reduced motion (handled in CSS), and absent
+    // JS the content simply renders as-is.
+    var settleTargets = document.querySelectorAll(
+        '.hero, .feature-card, .cta-section, ' +
+        '.auth-header, .auth-card, .auth-switch, ' +
+        '.legal-header, .legal-body'
+    );
+    Array.prototype.forEach.call(settleTargets, function (el, i) {
+        el.style.setProperty('--settle-i', i);
+        el.classList.add('settle');
+    });
+
+    // Hero mock bars fill from zero once the card has settled, giving the
+    // landing visual a satisfying second beat.
+    if (!prefersReducedMotion) {
+        var mockBars = document.querySelectorAll('.mock-bar');
+        Array.prototype.forEach.call(mockBars, function (bar) {
+            var target = bar.style.width;
+            bar.style.transition = 'none';   // reset to empty without animating
+            bar.style.width = '0';
+            void bar.offsetWidth;            // flush the reset
+            bar.style.transition = '';       // restore the stylesheet's width transition
+            setTimeout(function () { bar.style.width = target; }, 500);
+        });
+    }
+
+    // --- Profile page interactivity (no-ops on pages without these elements) ---
 
     // Time-of-day greeting personalised to the logged-in user.
     var greeting = document.querySelector('.profile-greeting');
